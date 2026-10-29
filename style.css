@@ -1,0 +1,86 @@
+.title {
+  font-weight: 200;
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+  text-align: center;
+}
+
+body {
+  background-color: #092f51;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.arena {
+  background-color: #092f51;
+  width: 100%;
+  height: 80%; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 1px 1px 20px hsl(0, 0%, 71%);
+}
+
+.enemy {
+  width: 120px;
+  height: 120px;
+  background-color: red;
+}
+
+.enemy-name {
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+}
+
+.hp-bar {
+  width: 500px;
+  height: 30px;
+  background-color: black;
+  border: 1px black solid;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.hp-status {
+  width: 100%;
+  height: 30px;
+  background-color: #c30606;
+}
+
+.hp-number {
+  color: white;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+  z-index: 2;
+  position: absolute;
+}
+
+.hero {
+  background-color: white;
+  width: 80px;
+  height: 80px;
+  margin-top: 100px;
+  margin-bottom: 30px;
+}
+
+
+  @keyframes hero-attack {
+    0% {
+      transform: translateY(0px)
+    }
+    50% {
+      transform: translateY(-25px)
+    }
+    100% {
+      transform: translateY(0px)
+    }
+  }
+
+  .hero-attack-animation {
+    animation: hero-attack 0.1s ease-out;
+  }
