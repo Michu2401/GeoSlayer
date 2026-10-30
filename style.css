@@ -83,6 +83,12 @@ body {
     }
   }
 
-  .hero-attack-animation {
-    animation: hero-attack 0.1s ease-out;
-  }
+.hero-attack-animation {
+  animation: hero-attack 0.1s ease-out;
+}
+
+.enemy-wave {
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+}
