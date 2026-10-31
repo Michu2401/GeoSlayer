@@ -5,10 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GeoSlayer</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <h1 class="title">GeoSlayer</h1>
     <div class="arena">
+      <div class="wave-stage-box">
+        <p class="enemy-wave"></p>
+        <p class="enemy-stage"></p>
+      </div>
       <div class="hp-bar">
         <div class="hp-status"></div>
         <p class="hp-number"></p>
@@ -16,11 +26,6 @@
       <p class="enemy-name">Enemy</p>
       <div class="enemy"></div>
       <div class="hero"></div>
-      <div class="wave-stage-box">
-        <p class="enemy-wave"></p>
-        <p class="enemy-stage"></p>
-      </div>
-      
     </div>
     <script src="script.js"></script>
   </body>
