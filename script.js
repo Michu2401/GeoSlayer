@@ -2,18 +2,24 @@
 const clickReceiver = document.querySelector(".arena")
 const mainCharacter = document.querySelector(".hero")
 // Zmienne potrzebne do pasku HP i DMG
-let enemyHp = 100;
-const dmg = 30
-const enemyMaxHp = 100;
+const baseHP = 80;
+let enemyHp = baseHP;
+const dmg = 90
+let enemyMaxHp = baseHP;
+const hpGrowth = 1.15;
 const hpStatus = document.querySelector(".hp-status");
 const hpNumber = document.querySelector(".hp-number");
 // Zmienne o przeciwnikach
 let enemyWave = 1;
 const maxEnemyWave = 5;
 const enemyWaveNumber = document.querySelector(".enemy-wave")
+// Zmienne etapów
+let stage = 1;
+const stageNumber = document.querySelector(".enemy-stage") 
 // Start Gry
 updateHpStatus();
 updateWaveNumber();
+updateStage();
 
 clickReceiver.addEventListener("click", () => {
   mainCharacter.classList.add("hero-attack-animation")
@@ -25,10 +31,15 @@ clickReceiver.addEventListener("click", () => {
     enemyHp = enemyMaxHp;
     if (enemyWave > maxEnemyWave) {
       enemyWave = 1;
+      stage ++;
+      enemyMaxHp = Math.floor(baseHP * (Math.pow(hpGrowth, stage - 1)));
+      enemyHp = enemyMaxHp;
     }
   }
-  updateWaveNumber();
+  
   updateHpStatus();
+  updateWaveNumber();
+  updateStage();
 }) 
 
 mainCharacter.addEventListener("animationend", () => {
@@ -43,4 +54,7 @@ function updateHpStatus() {
 }
 function updateWaveNumber() {
   enemyWaveNumber.textContent = "Przeciwnik " + enemyWave + " / " + maxEnemyWave;
+}
+function updateStage() {
+  stageNumber.textContent = "Stage " + stage;
 }
