@@ -21,3 +21,6 @@ Warunkiem zaliczenia przedmiotu na studiach jest projekt czyli stworzenie strony
 5. Zadawanie obrażeń
 6. Logika życia
 7. Logika poziomów i przeciwników
+8. Animacja pokonania przeciwnika
+9. Sposób na komunikacje pokonania przeciwnika
+10. Animacja zadawania obrażeń przeciwnikowi
