@@ -29,6 +29,9 @@ body {
   width: 120px;
   height: 120px;
   background-color: red;
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .enemy-name {

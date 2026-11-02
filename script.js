@@ -4,7 +4,7 @@ const mainCharacter = document.querySelector(".hero");
 // Zmienne potrzebne do pasku HP i DMG
 const baseHP = 80;
 let enemyHp = baseHP;
-const dmg = 90;
+const dmg = 30;
 let enemyMaxHp = baseHP;
 const hpGrowth = 1.15;
 const hpStatus = document.querySelector(".hp-status");
@@ -15,6 +15,10 @@ const maxEnemyWave = 5;
 const enemyWaveNumber = document.querySelector(".enemy-wave");
 // Zmienne etapów
 let stage = 1;
+// Czas miedzy przeciwnikami
+const cooldownTime = 500;
+let isCoolingDown = false;
+// Zmienna etapu
 const stageNumber = document.querySelector(".enemy-stage");
 // Start Gry
 updateHpStatus();
@@ -24,32 +28,46 @@ updateStage();
 clickReceiver.addEventListener("click", () => {
   mainCharacter.classList.add("hero-attack-animation");
 
-  enemyHp = enemyHp - dmg;
-  enemyHp = Math.max(0, enemyHp);
-  if (enemyHp <= 0) {
-    enemyWave = enemyWave + 1;
-    enemyHp = enemyMaxHp;
-    if (enemyWave > maxEnemyWave) {
-      enemyWave = 1;
-      stage++;
-      enemyMaxHp = Math.floor(baseHP * Math.pow(hpGrowth, stage - 1));
-      enemyHp = enemyMaxHp;
-    }
+  if (isCoolingDown) {
+    return;
   }
 
+  enemyHp = enemyHp - dmg;
+  enemyHp = Math.max(0, enemyHp);
+
   updateHpStatus();
-  updateWaveNumber();
-  updateStage();
+
+  if (enemyHp <= 0) {
+    isCoolingDown = true;
+
+    setTimeout(() => {
+      nextEnemy();
+      isCoolingDown = false;
+    }, cooldownTime);
+  }
 });
 
 mainCharacter.addEventListener("animationend", () => {
   mainCharacter.classList.remove("hero-attack-animation");
 });
-
 function updateHpStatus() {
   const percent = (enemyHp / enemyMaxHp) * 100;
   hpStatus.style.width = percent + "%";
   hpNumber.textContent = enemyHp;
+}
+function nextEnemy() {
+  enemyWave = enemyWave + 1;
+  enemyHp = enemyMaxHp;
+  if (enemyWave > maxEnemyWave) {
+    enemyWave = 1;
+    stage++;
+    enemyMaxHp = Math.floor(baseHP * Math.pow(hpGrowth, stage - 1));
+    enemyHp = enemyMaxHp;
+  }
+
+  updateHpStatus();
+  updateWaveNumber();
+  updateStage();
 }
 function updateWaveNumber() {
   enemyWaveNumber.textContent = "Przeciwnik " + enemyWave + "/" + maxEnemyWave;
