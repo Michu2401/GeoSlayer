@@ -29,6 +29,7 @@ updateStage();
 
 clickReceiver.addEventListener("click", () => {
   mainCharacter.classList.add("hero-attack-animation");
+  enemy.classList.add("enemy-hit")
 
   if (isCoolingDown) {
     return;
@@ -52,6 +53,7 @@ clickReceiver.addEventListener("click", () => {
 
 mainCharacter.addEventListener("animationend", () => {
   mainCharacter.classList.remove("hero-attack-animation");
+  enemy.classList.remove("enemy-hit")
 });
 function updateHpStatus() {
   const percent = (enemyHp / enemyMaxHp) * 100;

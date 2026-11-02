@@ -30,12 +30,16 @@ body {
   height: 120px;
   background-color: red;
   opacity: 1;
-  transition: opacity 0.3s;
+  transition: opacity 0.2s;
+}
+
+.enemy-hit {
+  animation: enemy-hit 0.2s ease-out;
 }
 
 .enemy-defeted {
   opacity: 0.2;
-  animation: enemy-defeat 0.6s ease-out;
+  animation: enemy-defeat 0.45s ease-out;
 }
 
 @keyframes enemy-defeat {
@@ -44,6 +48,15 @@ body {
   }
   100% {
     transform: rotate(-60deg) scale(0.6);
+  }
+}
+
+@keyframes enemy-hit {
+  from {
+    background-color:red;
+  }
+  to {
+    background-color: rgb(99, 0, 0);
   }
 }
 
