@@ -18,6 +18,8 @@ let stage = 1;
 // Czas miedzy przeciwnikami
 const cooldownTime = 500;
 let isCoolingDown = false;
+// Zmienna przeciwnika
+const enemy = document.querySelector(".enemy")
 // Zmienna etapu
 const stageNumber = document.querySelector(".enemy-stage");
 // Start Gry
@@ -38,6 +40,7 @@ clickReceiver.addEventListener("click", () => {
   updateHpStatus();
 
   if (enemyHp <= 0) {
+    enemy.classList.add("enemy-defeted")
     isCoolingDown = true;
 
     setTimeout(() => {
@@ -56,6 +59,7 @@ function updateHpStatus() {
   hpNumber.textContent = enemyHp;
 }
 function nextEnemy() {
+  enemy.classList.remove("enemy-defeted")
   enemyWave = enemyWave + 1;
   enemyHp = enemyMaxHp;
   if (enemyWave > maxEnemyWave) {
