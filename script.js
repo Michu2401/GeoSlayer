@@ -22,6 +22,10 @@ let isCoolingDown = false;
 const enemy = document.querySelector(".enemy")
 // Zmienna etapu
 const stageNumber = document.querySelector(".enemy-stage");
+// Zmienne pokazywania obrażeń
+const dmgNumber = document.createElement("div");
+dmgNumber.className = "dmgNumber"
+dmgNumber.textContent = "-" + dmg 
 // Start Gry
 updateHpStatus();
 updateWaveNumber();
@@ -30,6 +34,7 @@ updateStage();
 clickReceiver.addEventListener("click", () => {
   mainCharacter.classList.add("hero-attack-animation");
   enemy.classList.add("enemy-hit")
+  document.querySelector(".arena").appendChild(dmgNumber)
 
   if (isCoolingDown) {
     return;
@@ -55,6 +60,11 @@ mainCharacter.addEventListener("animationend", () => {
   mainCharacter.classList.remove("hero-attack-animation");
   enemy.classList.remove("enemy-hit")
 });
+
+dmgNumber.addEventListener("animationend", () => {
+  dmgNumber.remove();
+})
+
 function updateHpStatus() {
   const percent = (enemyHp / enemyMaxHp) * 100;
   hpStatus.style.width = percent + "%";
