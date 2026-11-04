@@ -35,12 +35,9 @@ clickReceiver.addEventListener("click", () => {
   if (isCoolingDown) {
     return;
   }
-
-  showDmg(dmg)
-
   enemyHp = enemyHp - dmg;
   enemyHp = Math.max(0, enemyHp);
-
+  showDmg(dmg)
   updateHpStatus();
 
   if (enemyHp <= 0) {
