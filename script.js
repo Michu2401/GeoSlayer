@@ -23,9 +23,6 @@ const enemy = document.querySelector(".enemy")
 // Zmienna etapu
 const stageNumber = document.querySelector(".enemy-stage");
 // Zmienne pokazywania obrażeń
-const dmgNumber = document.createElement("div");
-dmgNumber.className = "dmgNumber"
-dmgNumber.textContent = "-" + dmg 
 // Start Gry
 updateHpStatus();
 updateWaveNumber();
@@ -34,11 +31,12 @@ updateStage();
 clickReceiver.addEventListener("click", () => {
   mainCharacter.classList.add("hero-attack-animation");
   enemy.classList.add("enemy-hit")
-  document.querySelector(".arena").appendChild(dmgNumber)
 
   if (isCoolingDown) {
     return;
   }
+
+  showDmg(dmg)
 
   enemyHp = enemyHp - dmg;
   enemyHp = Math.max(0, enemyHp);
@@ -61,9 +59,7 @@ mainCharacter.addEventListener("animationend", () => {
   enemy.classList.remove("enemy-hit")
 });
 
-dmgNumber.addEventListener("animationend", () => {
-  dmgNumber.remove();
-})
+
 
 function updateHpStatus() {
   const percent = (enemyHp / enemyMaxHp) * 100;
@@ -90,4 +86,22 @@ function updateWaveNumber() {
 }
 function updateStage() {
   stageNumber.textContent = "Stage " + stage;
+}
+
+function randomBetween(min, max) {
+  return min + Math.random() * (max - min);
+}
+
+function showDmg(dmg) {
+  const dmgNumber = document.createElement("div");
+  dmgNumber.className = "dmgNumber";
+  dmgNumber.textContent = "-" + dmg;
+  dmgNumber.style.left = randomBetween(30, 70) + "%";
+  dmgNumber.style.top = randomBetween(20, 60) + "%";
+  dmgNumber.style.fontSize = randomBetween(14, 22) + "px"
+  document.querySelector(".arena").appendChild(dmgNumber);
+  
+  dmgNumber.addEventListener("animationend", () => {
+    dmgNumber.remove();
+  })
 }
