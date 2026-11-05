@@ -23,9 +23,7 @@ const ui = {
   stageNumber: document.querySelector(".enemy-stage"),
 };
 // Zmienne pokazywania obrażeń
-const dmgNumber = document.createElement("div");
-dmgNumber.className = "dmgNumber";
-dmgNumber.textContent = "-" + config.dmg;
+// Start Gry
 updateHpStatus();
 updateWaveNumber();
 updateStage();
@@ -33,15 +31,13 @@ updateStage();
 ui.clickReceiver.addEventListener("click", () => {
   ui.hero.classList.add("hero-attack-animation");
   ui.enemy.classList.add("enemy-hit");
-  document.querySelector(".arena").appendChild(dmgNumber);
 
   if (state.isCoolingDown) {
     return;
   }
-
   state.enemyHp = state.enemyHp - config.dmg;
   state.enemyHp = Math.max(0, state.enemyHp);
-
+  showDmg(config.dmg);
   updateHpStatus();
 
   if (state.enemyHp <= 0) {
@@ -58,10 +54,6 @@ ui.clickReceiver.addEventListener("click", () => {
 ui.hero.addEventListener("animationend", () => {
   ui.hero.classList.remove("hero-attack-animation");
   ui.enemy.classList.remove("enemy-hit");
-});
-
-dmgNumber.addEventListener("animationend", () => {
-  dmgNumber.remove();
 });
 
 function updateHpStatus() {
@@ -92,4 +84,22 @@ function updateWaveNumber() {
 }
 function updateStage() {
   ui.stageNumber.textContent = "Stage " + state.stage;
+}
+
+function randomBetween(min, max) {
+  return min + Math.random() * (max - min);
+}
+
+function showDmg(dmg) {
+  const dmgNumber = document.createElement("div");
+  dmgNumber.className = "dmgNumber";
+  dmgNumber.textContent = "-" + dmg;
+  dmgNumber.style.left = randomBetween(30, 70) + "%";
+  dmgNumber.style.top = randomBetween(20, 60) + "%";
+  dmgNumber.style.fontSize = randomBetween(14, 22) + "px";
+  document.querySelector(".arena").appendChild(dmgNumber);
+
+  dmgNumber.addEventListener("animationend", () => {
+    dmgNumber.remove();
+  });
 }

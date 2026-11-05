@@ -28,8 +28,6 @@ body {
 
 .dmgNumber {
   position: absolute;
-  top: 330px;
-  left: 700px;
   pointer-events: none;
   color: white;
   font-weight: 400;
