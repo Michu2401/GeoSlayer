@@ -1,84 +1,85 @@
-// Zbieranie klas do tworzenia animacji
-const clickReceiver = document.querySelector(".arena");
-const mainCharacter = document.querySelector(".hero");
-// Zmienne potrzebne do pasku HP i DMG
-const baseHP = 80;
-let enemyHp = baseHP;
-const dmg = 30;
-let enemyMaxHp = baseHP;
-const hpGrowth = 1.15;
-const hpStatus = document.querySelector(".hp-status");
-const hpNumber = document.querySelector(".hp-number");
-// Zmienne o przeciwnikach
-let enemyWave = 1;
-const maxEnemyWave = 5;
-const enemyWaveNumber = document.querySelector(".enemy-wave");
-// Zmienne etapów
-let stage = 1;
-// Czas miedzy przeciwnikami
-const cooldownTime = 500;
-let isCoolingDown = false;
-// Zmienna przeciwnika
-const enemy = document.querySelector(".enemy")
-// Zmienna etapu
-const stageNumber = document.querySelector(".enemy-stage");
+// Przejscie na obiekty
+const config = {
+  baseHP: 80,
+  hpGrowth: 1.15,
+  cooldownTime: 500,
+  maxEnemyWave: 5,
+  dmg: 30,
+};
+const state = {
+  enemyNumber: 1,
+  stage: 1,
+  enemyHp: config.baseHP,
+  enemyMaxHp: config.baseHP,
+  isCoolingDown: false,
+};
+const ui = {
+  clickReceiver: document.querySelector(".arena"),
+  hero: document.querySelector(".hero"),
+  hpStatus: document.querySelector(".hp-status"),
+  hpNumber: document.querySelector(".hp-number"),
+  enemyWaveNumber: document.querySelector(".enemy-wave"),
+  enemy: document.querySelector(".enemy"),
+  stageNumber: document.querySelector(".enemy-stage"),
+};
 // Zmienne pokazywania obrażeń
 const dmgNumber = document.createElement("div");
-dmgNumber.className = "dmgNumber"
-dmgNumber.textContent = "-" + dmg 
-// Start Gry
+dmgNumber.className = "dmgNumber";
+dmgNumber.textContent = "-" + config.dmg;
 updateHpStatus();
 updateWaveNumber();
 updateStage();
 
-clickReceiver.addEventListener("click", () => {
-  mainCharacter.classList.add("hero-attack-animation");
-  enemy.classList.add("enemy-hit")
-  document.querySelector(".arena").appendChild(dmgNumber)
+ui.clickReceiver.addEventListener("click", () => {
+  ui.hero.classList.add("hero-attack-animation");
+  ui.enemy.classList.add("enemy-hit");
+  document.querySelector(".arena").appendChild(dmgNumber);
 
-  if (isCoolingDown) {
+  if (state.isCoolingDown) {
     return;
   }
 
-  enemyHp = enemyHp - dmg;
-  enemyHp = Math.max(0, enemyHp);
+  state.enemyHp = state.enemyHp - config.dmg;
+  state.enemyHp = Math.max(0, state.enemyHp);
 
   updateHpStatus();
 
-  if (enemyHp <= 0) {
-    enemy.classList.add("enemy-defeted")
-    isCoolingDown = true;
+  if (state.enemyHp <= 0) {
+    ui.enemy.classList.add("enemy-defeted");
+    state.isCoolingDown = true;
 
     setTimeout(() => {
       nextEnemy();
-      isCoolingDown = false;
-    }, cooldownTime);
+      state.isCoolingDown = false;
+    }, config.cooldownTime);
   }
 });
 
-mainCharacter.addEventListener("animationend", () => {
-  mainCharacter.classList.remove("hero-attack-animation");
-  enemy.classList.remove("enemy-hit")
+ui.hero.addEventListener("animationend", () => {
+  ui.hero.classList.remove("hero-attack-animation");
+  ui.enemy.classList.remove("enemy-hit");
 });
 
 dmgNumber.addEventListener("animationend", () => {
   dmgNumber.remove();
-})
+});
 
 function updateHpStatus() {
-  const percent = (enemyHp / enemyMaxHp) * 100;
-  hpStatus.style.width = percent + "%";
-  hpNumber.textContent = enemyHp;
+  const percent = (state.enemyHp / state.enemyMaxHp) * 100;
+  ui.hpStatus.style.width = percent + "%";
+  ui.hpNumber.textContent = state.enemyHp;
 }
 function nextEnemy() {
-  enemy.classList.remove("enemy-defeted")
-  enemyWave = enemyWave + 1;
-  enemyHp = enemyMaxHp;
-  if (enemyWave > maxEnemyWave) {
-    enemyWave = 1;
-    stage++;
-    enemyMaxHp = Math.floor(baseHP * Math.pow(hpGrowth, stage - 1));
-    enemyHp = enemyMaxHp;
+  ui.enemy.classList.remove("enemy-defeted");
+  state.enemyNumber = state.enemyNumber + 1;
+  state.enemyHp = state.enemyMaxHp;
+  if (state.enemyNumber > config.maxEnemyWave) {
+    state.enemyNumber = 1;
+    state.stage++;
+    state.enemyMaxHp = Math.floor(
+      config.baseHP * Math.pow(config.hpGrowth, state.stage - 1),
+    );
+    state.enemyHp = state.enemyMaxHp;
   }
 
   updateHpStatus();
@@ -86,8 +87,9 @@ function nextEnemy() {
   updateStage();
 }
 function updateWaveNumber() {
-  enemyWaveNumber.textContent = "Przeciwnik " + enemyWave + "/" + maxEnemyWave;
+  ui.enemyWaveNumber.textContent =
+    "Przeciwnik " + state.enemyNumber + "/" + config.maxEnemyWave;
 }
 function updateStage() {
-  stageNumber.textContent = "Stage " + stage;
+  ui.stageNumber.textContent = "Stage " + state.stage;
 }
