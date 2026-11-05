@@ -68,9 +68,7 @@ function nextEnemy() {
   if (state.enemyNumber > config.maxEnemyWave) {
     state.enemyNumber = 1;
     state.stage++;
-    state.enemyMaxHp = Math.floor(
-      config.baseHP * Math.pow(config.hpGrowth, state.stage - 1),
-    );
+    state.enemyMaxHp = calcEnemyMaxHp(state.stage)
     state.enemyHp = state.enemyMaxHp;
   }
 
@@ -88,6 +86,12 @@ function updateStage() {
 
 function randomBetween(min, max) {
   return min + Math.random() * (max - min);
+}
+
+function calcEnemyMaxHp(stage) {
+  return Math.floor(
+      config.baseHP * Math.pow(config.hpGrowth, stage - 1),
+    );
 }
 
 function showDmg(dmg) {
