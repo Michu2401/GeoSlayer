@@ -1,6 +1,7 @@
 // Przejscie na obiekty
 const config = {
   baseHP: 80,
+  heroBaseHp: 10,
   hpGrowth: 1.15,
   cooldownTime: 500,
   maxEnemyWave: 5,
@@ -12,6 +13,8 @@ const state = {
   enemyHp: config.baseHP,
   enemyMaxHp: config.baseHP,
   isCoolingDown: false,
+  heroHp: config.heroBaseHp,
+  heroMaxHp: config.heroBaseHp,
 };
 const ui = {
   clickReceiver: document.querySelector(".arena"),
@@ -21,20 +24,23 @@ const ui = {
   enemyWaveNumber: document.querySelector(".enemy-wave"),
   enemy: document.querySelector(".enemy"),
   stageNumber: document.querySelector(".enemy-stage"),
+  heroHpStatus: document.querySelector(".hero-hp .hp-status"),
+  heroHpNumber: document.querySelector(".hero-hp .hp-number"),
 };
 // Zmienne pokazywania obrażeń
 // Start Gry
 updateHpStatus();
 updateWaveNumber();
 updateStage();
+updateHeroHp();
 
 ui.clickReceiver.addEventListener("click", () => {
   ui.hero.classList.add("hero-attack-animation");
-  ui.enemy.classList.add("enemy-hit");
 
   if (state.isCoolingDown) {
     return;
   }
+  ui.enemy.classList.add("enemy-hit");
   state.enemyHp = state.enemyHp - config.dmg;
   state.enemyHp = Math.max(0, state.enemyHp);
   showDmg(config.dmg);
@@ -57,9 +63,10 @@ ui.hero.addEventListener("animationend", () => {
 });
 
 function updateHpStatus() {
-  const percent = (state.enemyHp / state.enemyMaxHp) * 100;
-  ui.hpStatus.style.width = percent + "%";
-  ui.hpNumber.textContent = state.enemyHp;
+  drawBar(ui.hpStatus, ui.hpNumber, state.enemyHp, state.enemyMaxHp);
+}
+function updateHeroHp() {
+  drawBar(ui.heroHpStatus, ui.heroHpNumber, state.heroHp, state.heroMaxHp);
 }
 function nextEnemy() {
   ui.enemy.classList.remove("enemy-defeted");
@@ -68,7 +75,7 @@ function nextEnemy() {
   if (state.enemyNumber > config.maxEnemyWave) {
     state.enemyNumber = 1;
     state.stage++;
-    state.enemyMaxHp = calcEnemyMaxHp(state.stage)
+    state.enemyMaxHp = calcEnemyMaxHp(state.stage);
     state.enemyHp = state.enemyMaxHp;
   }
 
@@ -89,9 +96,7 @@ function randomBetween(min, max) {
 }
 
 function calcEnemyMaxHp(stage) {
-  return Math.floor(
-      config.baseHP * Math.pow(config.hpGrowth, stage - 1),
-    );
+  return Math.floor(config.baseHP * Math.pow(config.hpGrowth, stage - 1));
 }
 
 function showDmg(dmg) {
@@ -106,4 +111,10 @@ function showDmg(dmg) {
   dmgNumber.addEventListener("animationend", () => {
     dmgNumber.remove();
   });
+}
+
+function drawBar(fillEl, textEl, current, max) {
+  const percent = (current / max) * 100;
+  fillEl.style.width = percent + "%";
+  textEl.textContent = current;
 }
