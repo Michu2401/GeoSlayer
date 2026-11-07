@@ -1,17 +1,21 @@
 // Przejscie na obiekty
 const config = {
   baseHP: 80,
-  heroBaseHp: 10,
+  heroBaseHp: 1000,
   hpGrowth: 1.15,
   cooldownTime: 500,
+  enemyCooldownTime: 1000,
   maxEnemyWave: 5,
   dmg: 30,
+  enemyBaseDmg: 1,
+  enemyGrowthDmg: 1.15,
 };
 const state = {
   enemyNumber: 1,
   stage: 1,
   enemyHp: config.baseHP,
   enemyMaxHp: config.baseHP,
+  enemyDmg: config.enemyBaseDmg,
   isCoolingDown: false,
   heroHp: config.heroBaseHp,
   heroMaxHp: config.heroBaseHp,
@@ -27,12 +31,12 @@ const ui = {
   heroHpStatus: document.querySelector(".hero-hp .hp-status"),
   heroHpNumber: document.querySelector(".hero-hp .hp-number"),
 };
-// Zmienne pokazywania obrażeń
 // Start Gry
 updateHpStatus();
 updateWaveNumber();
 updateStage();
 updateHeroHp();
+setInterval(enemyAttack, config.enemyCooldownTime)
 
 ui.clickReceiver.addEventListener("click", () => {
   ui.hero.classList.add("hero-attack-animation");
@@ -77,6 +81,7 @@ function nextEnemy() {
     state.stage++;
     state.enemyMaxHp = calcEnemyMaxHp(state.stage);
     state.enemyHp = state.enemyMaxHp;
+    state.enemyDmg = calcEnemyDmg(state.stage)
   }
 
   updateHpStatus();
@@ -99,6 +104,10 @@ function calcEnemyMaxHp(stage) {
   return Math.floor(config.baseHP * Math.pow(config.hpGrowth, stage - 1));
 }
 
+function calcEnemyDmg(stage) {
+  return config.enemyBaseDmg * Math.pow(config.enemyGrowthDmg, stage - 1)
+}
+
 function showDmg(dmg) {
   const dmgNumber = document.createElement("div");
   dmgNumber.className = "dmgNumber";
@@ -111,6 +120,18 @@ function showDmg(dmg) {
   dmgNumber.addEventListener("animationend", () => {
     dmgNumber.remove();
   });
+}
+
+function enemyAttack() {
+  if (state.isCoolingDown) {
+    return;
+  }
+  if (state.heroHp <= 0) {
+    return;
+  }
+  state.heroHp = state.heroHp - state.enemyDmg;
+  state.heroHp = Math.max(0, state.heroHp);
+  updateHeroHp();
 }
 
 function drawBar(fillEl, textEl, current, max) {
