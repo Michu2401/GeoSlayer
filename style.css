@@ -59,7 +59,7 @@ body {
   animation: enemy-hit 0.2s ease-out;
 }
 
-.enemy-defeted {
+.enemy-defeated {
   opacity: 0.2;
   animation: enemy-defeat 0.45s ease-out;
 }
@@ -136,7 +136,23 @@ body {
   }
 }
 
+@keyframes hero-exit {
+  from { transform: translateX(0); border-radius:0%; }
+  to  { transform: translateX(100vw); border-radius:100%; }
+}
 
+@keyframes hero-return {
+   from { transform: translateX(-100vw); border-radius:100%;}
+    to  { transform: translateX(0); border-radius:0%;}
+}
+
+.hero-exit {
+    animation: hero-exit 1s ease-in-out forwards;
+}
+
+.hero-return {
+  animation: hero-return 1s ease-out;
+}
 
 .hero-attack-animation {
   animation: hero-attack 0.3s ease-out;
@@ -165,4 +181,63 @@ body {
   flex-direction: row;
   justify-content: space-evenly;
   margin-top: 60px;
+}
+
+.komunikat {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.komunikat-hidden {
+  display: none;
+}
+
+.komunikat-box {
+  background-color: #9ecef7;
+  font-family: "Red Hat Display", Helvetica, sans-serif;
+  color: white;
+  width: 500px;
+  height: 600px;
+  display: flex;
+  text-align: center;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+}
+
+.komunikat-box h2 {
+  font-size: 26px;
+  text-transform: uppercase;
+  letter-spacing: 8px;
+  font-weight: 900;
+  margin-top: 60px;
+  margin-bottom: 20px;
+}
+
+.komunikat-box p {
+  margin-top: 60px;
+  margin-right: 40px;
+  margin-left: 40px;
+}
+
+.komunikat-box label {
+  margin-top: 60px;
+}
+
+.komunikat-box button {
+  width: 160px;
+  height: 40px;
+  border: 1px solid hsl(0, 0%, 60%);
+  margin-top: 60px;
+  transition: 0.3s ease;
+}
+
+.komunikat-box button:hover {
+  background-color: hsl(0, 0%, 80%);
+  border-radius: 12px;
 }
