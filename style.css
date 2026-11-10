@@ -1,10 +1,33 @@
 .title {
   font-weight: 400;
-  font-family: "Red Hat Display", Helvetica, sans-serif;
   color: white;
   text-align: center;
 }
 
+.menu {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  text-align: center;
+}
+
+.currency-box {
+  width: 160px;
+  height: 45px;
+  background-color: #9ecef7;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.currency{
+  color: white;
+  font-weight: 400;
+  font-size: 18px;
+  margin: 0;
+}
 body {
   background-color: #092f51;
   margin: 0;
@@ -13,6 +36,7 @@ body {
   height: 100vh;
   overflow: hidden;
   user-select: none;
+  font-family: "Red Hat Display", Helvetica, sans-serif;
 }
 
 .arena {
@@ -31,7 +55,6 @@ body {
   pointer-events: none;
   color: white;
   font-weight: 400;
-  font-family: "Red Hat Display", Helvetica, sans-serif;
   color: white;
   animation: dmgVanish 0.3s ease;
   opacity: 1;
@@ -83,7 +106,6 @@ body {
 }
 
 .enemy-name {
-  font-family: "Red Hat Display", Helvetica, sans-serif;
   color: white;
   font-weight: 600;
   text-transform: uppercase;
@@ -110,7 +132,6 @@ body {
 .hp-number {
   color: white;
   font-weight: bold;
-  font-family: "Red Hat Display", Helvetica, sans-serif;
   position: absolute;
   width: 100%;
   text-align: center;
@@ -137,21 +158,21 @@ body {
 }
 
 @keyframes hero-exit {
-  from { transform: translateX(0); border-radius:0%; }
-  to  { transform: translateX(100vw); border-radius:100%; }
+  from { transform: translateX(0); opacity: 1;}
+  to  { transform: translateX(30vw); opacity: 0;}
 }
 
 @keyframes hero-return {
-   from { transform: translateX(-100vw); border-radius:100%;}
-    to  { transform: translateX(0); border-radius:0%;}
+   from { transform: translateX(-30vw); opacity: 0;}
+    to  { transform: translateX(0); opacity: 1;}
 }
 
 .hero-exit {
-    animation: hero-exit 1s ease-in-out forwards;
+    animation: hero-exit 0.7s ease-in-out forwards;
 }
 
 .hero-return {
-  animation: hero-return 1s ease-out;
+  animation: hero-return 0.7s ease-out;
 }
 
 .hero-attack-animation {
@@ -160,14 +181,12 @@ body {
 
 .enemy-wave {
   font-weight: 700;
-  font-family: "Red Hat Display", Helvetica, sans-serif;
   color: white;
   text-transform: uppercase;
 }
 
 .enemy-stage {
-  font-weight: 700;
-  font-family: "Red Hat Display", Helvetica, sans-serif;
+  font-weight: 700; 
   color: white;
   text-transform: uppercase;
 }
@@ -198,7 +217,7 @@ body {
 
 .komunikat-box {
   background-color: #9ecef7;
-  font-family: "Red Hat Display", Helvetica, sans-serif;
+  
   color: white;
   width: 500px;
   height: 600px;

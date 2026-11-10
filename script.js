@@ -10,6 +10,7 @@ const config = {
   enemyBaseDmg: 1,
   enemyGrowthDmg: 1.15,
   heroRespawnTime: 400,
+  enemyReward: 1,
 };
 const state = {
   enemyNumber: 1,
@@ -22,6 +23,7 @@ const state = {
   isCoolingDown: false,
   isDefeated: false,
   dontShowAgain: false,
+  currency: 0,
 };
 const ui = {
   clickReceiver: document.querySelector(".arena"),
@@ -35,13 +37,15 @@ const ui = {
   heroHpNumber: document.querySelector(".hero-hp .hp-number"),
   okButton: document.querySelector(".komunikat-ok"),
   check: document.querySelector(".komunikat-check"),
-  komunikat: document.querySelector(".komunikat")
+  komunikat: document.querySelector(".komunikat"),
+  currencyText: document.querySelector(".currency"),
 };
 // Start Gry
 updateHpStatus();
 updateWaveNumber();
 updateStage();
 updateHeroHp();
+updateCurrency();
 setInterval(enemyAttack, config.enemyCooldownTime)
 
 ui.clickReceiver.addEventListener("click", () => {
@@ -58,6 +62,8 @@ ui.clickReceiver.addEventListener("click", () => {
   if (state.enemyHp <= 0) {
     ui.enemy.classList.add("enemy-defeated");
     state.isCoolingDown = true;
+    state.currency = state.currency + config.enemyReward;
+    updateCurrency();
 
     setTimeout(() => {
       nextEnemy();
@@ -190,4 +196,8 @@ function respawnHero() {
   ui.hero.classList.remove("hero-exit");
   ui.hero.classList.add("hero-return");
   resetStage();
+}
+
+function updateCurrency() {
+  ui.currencyText.textContent = "Geo-Points: " + state.currency
 }
