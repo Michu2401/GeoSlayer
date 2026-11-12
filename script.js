@@ -11,6 +11,9 @@ const config = {
   enemyGrowthDmg: 1.15,
   heroRespawnTime: 400,
   enemyReward: 1,
+  dmgBaseUpgradeCost: 10,
+  costGrowth: 1.1,
+  baseDmgUpgrade: 10,
 };
 const state = {
   enemyNumber: 1,
@@ -24,6 +27,8 @@ const state = {
   isDefeated: false,
   dontShowAgain: false,
   currency: 0,
+  upgradeLevel: 0,
+  heroDmg: config.dmg,
 };
 const ui = {
   clickReceiver: document.querySelector(".arena"),
@@ -39,6 +44,7 @@ const ui = {
   check: document.querySelector(".komunikat-check"),
   komunikat: document.querySelector(".komunikat"),
   currencyText: document.querySelector(".currency"),
+  dmgUpgrade: document.querySelector(".dmg-upgrade")
 };
 // Start Gry
 updateHpStatus();
@@ -46,6 +52,7 @@ updateWaveNumber();
 updateStage();
 updateHeroHp();
 updateCurrency();
+updateShop();
 setInterval(enemyAttack, config.enemyCooldownTime)
 
 ui.clickReceiver.addEventListener("click", () => {
@@ -54,9 +61,9 @@ ui.clickReceiver.addEventListener("click", () => {
   }
   ui.hero.classList.add("hero-attack-animation");
   ui.enemy.classList.add("enemy-hit");
-  state.enemyHp = state.enemyHp - config.dmg;
+  state.enemyHp = state.enemyHp - state.heroDmg;
   state.enemyHp = Math.max(0, state.enemyHp);
-  showDmg(config.dmg);
+  showDmg(state.heroDmg);
   updateHpStatus();
 
   if (state.enemyHp <= 0) {
@@ -97,6 +104,8 @@ ui.okButton.addEventListener("click", () => {
   ui.komunikat.classList.add("komunikat-hidden")
   respawnHero();
 })
+
+ui.dmgUpgrade.addEventListener("click", buyDmgUpgrade);
 
 function updateHpStatus() {
   drawBar(ui.hpStatus, ui.hpNumber, state.enemyHp, state.enemyMaxHp);
@@ -201,3 +210,28 @@ function respawnHero() {
 function updateCurrency() {
   ui.currencyText.textContent = "Geo-Points: " + state.currency
 }
+
+function calcDmgCost(level) {
+  return Math.floor(config.dmgBaseUpgradeCost * Math.pow(config.costGrowth, level))
+}
+
+function updateShop() {
+  const cost = calcDmgCost(state.upgradeLevel);
+  if(state.currency < cost) {
+    ui.dmgUpgrade.disabled
+  }
+  ui.dmgUpgrade.textContent = "DMG: " + config.baseDmgUpgrade + " cost: " + cost + "\nActual DMG: " + state.heroDmg
+}
+
+function buyDmgUpgrade() {
+  const cost = calcDmgCost(state.upgradeLevel);
+  if(state.currency < cost) {
+    return;
+  }
+  state.currency = state.currency - cost;
+  state.upgradeLevel = state.upgradeLevel + 1;
+  state.heroDmg = state.heroDmg + config.baseDmgUpgrade;
+  updateCurrency();
+  updateShop();
+}
+
