@@ -292,3 +292,27 @@ body {
 .dmg-upgrade:disabled {
   background-color: #494747;
 }
+
+.hp-upgrade {
+  width: 240px;
+  height: 45px;
+  background-color: #9ecef7;
+  border-radius: 6px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  font-size: 16px;
+  color: #000303;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.hp-upgrade:hover:not(:disabled) {
+  background-color: #2e9af9;
+  color: white;
+}
+
+.hp-upgrade:disabled {
+  background-color: #494747;
+}

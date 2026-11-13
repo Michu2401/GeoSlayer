@@ -13,7 +13,9 @@ const config = {
   enemyReward: 5,
   dmgBaseUpgradeCost: 10,
   costGrowth: 1.1,
-  baseDmgUpgrade: 10,
+  dmgUpgradeBonus: 10,
+  hpBaseUpgradeCost: 10,
+  hpUpgradeBonus: 10,
 };
 const state = {
   enemyNumber: 1,
@@ -27,7 +29,8 @@ const state = {
   isDefeated: false,
   dontShowAgain: false,
   currency: 0,
-  upgradeLevel: 0,
+  dmgLevel: 0,
+  hpLevel: 0,
   heroDmg: config.dmg,
 };
 const ui = {
@@ -44,7 +47,8 @@ const ui = {
   check: document.querySelector(".komunikat-check"),
   komunikat: document.querySelector(".komunikat"),
   currencyText: document.querySelector(".currency"),
-  dmgUpgrade: document.querySelector(".dmg-upgrade")
+  dmgUpgrade: document.querySelector(".dmg-upgrade"),
+  hpUpgrade: document.querySelector(".hp-upgrade"),
 };
 // Start Gry
 updateHpStatus();
@@ -107,6 +111,7 @@ ui.okButton.addEventListener("click", () => {
 })
 
 ui.dmgUpgrade.addEventListener("click", buyDmgUpgrade);
+ui.hpUpgrade.addEventListener("click", buyHpUpgrade)
 
 function updateHpStatus() {
   drawBar(ui.hpStatus, ui.hpNumber, state.enemyHp, state.enemyMaxHp);
@@ -214,25 +219,41 @@ function updateCurrency() {
   ui.currencyText.textContent = "Geo-Points: " + state.currency
 }
 
-function calcDmgCost(level) {
-  return Math.floor(config.dmgBaseUpgradeCost * Math.pow(config.costGrowth, level))
+function calcUpgradeCost(baseCost, level) {
+  return Math.floor(baseCost * Math.pow(config.costGrowth, level))
 }
 
 function updateShop() {
-  const cost = calcDmgCost(state.upgradeLevel);
-  ui.dmgUpgrade.disabled = state.currency < cost
-  ui.dmgUpgrade.textContent = "Bonus: " + config.baseDmgUpgrade + " Koszt: " + cost + " DMG: " + state.heroDmg;
+  const dmgCost = calcUpgradeCost(config.dmgBaseUpgradeCost, state.dmgLevel);
+  const hpCost = calcUpgradeCost(config.hpBaseUpgradeCost, state.hpLevel)
+  ui.dmgUpgrade.disabled = state.currency < dmgCost;
+  ui.dmgUpgrade.textContent = "Bonus: " + config.dmgUpgradeBonus + " Koszt: " + dmgCost + " DMG: " + state.heroDmg;
+  ui.hpUpgrade.disabled = state.currency < hpCost;
+  ui.hpUpgrade.textContent = "Bonus: " + config.hpUpgradeBonus + " Koszt: " + hpCost + " MaxHP: " + state.heroMaxHp;
+  
 }
 
 function buyDmgUpgrade() {
-  const cost = calcDmgCost(state.upgradeLevel);
-  if(state.currency < cost) {
+  const dmgCost = calcUpgradeCost(config.dmgBaseUpgradeCost, state.dmgLevel);
+  if(state.currency < dmgCost) {
     return;
   }
-  state.currency = state.currency - cost;
-  state.upgradeLevel = state.upgradeLevel + 1;
-  state.heroDmg = state.heroDmg + config.baseDmgUpgrade;
+  state.currency = state.currency - dmgCost;
+  state.dmgLevel = state.dmgLevel + 1;
+  state.heroDmg = state.heroDmg + config.dmgUpgradeBonus;
   updateCurrency();
   updateShop();
 }
 
+function buyHpUpgrade() {
+  const hpCost = calcUpgradeCost(config.hpBaseUpgradeCost, state.hpLevel);
+  if(state.currency < hpCost) {
+    return;
+  }
+  state.currency = state.currency - hpCost;
+  state.hpLevel = state.hpLevel + 1;
+  state.heroMaxHp = state.heroMaxHp + config.hpUpgradeBonus;
+  updateCurrency();
+  updateShop();
+  updateHeroHp();
+}
