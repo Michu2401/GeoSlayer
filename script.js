@@ -10,7 +10,7 @@ const config = {
   enemyBaseDmg: 1,
   enemyGrowthDmg: 1.15,
   heroRespawnTime: 400,
-  enemyReward: 1,
+  enemyReward: 5,
   dmgBaseUpgradeCost: 10,
   costGrowth: 1.1,
   baseDmgUpgrade: 10,
@@ -71,6 +71,7 @@ ui.clickReceiver.addEventListener("click", () => {
     state.isCoolingDown = true;
     state.currency = state.currency + config.enemyReward;
     updateCurrency();
+    updateShop();
 
     setTimeout(() => {
       nextEnemy();
@@ -123,6 +124,8 @@ function nextEnemy() {
     state.enemyMaxHp = calcEnemyMaxHp(state.stage);
     state.enemyHp = state.enemyMaxHp;
     state.enemyDmg = roundTo2(calcEnemyDmg(state.stage));
+    state.heroHp = state.heroMaxHp;
+    updateHeroHp();
   }
 
   updateHpStatus();
@@ -217,10 +220,8 @@ function calcDmgCost(level) {
 
 function updateShop() {
   const cost = calcDmgCost(state.upgradeLevel);
-  if(state.currency < cost) {
-    ui.dmgUpgrade.disabled
-  }
-  ui.dmgUpgrade.textContent = "DMG: " + config.baseDmgUpgrade + " cost: " + cost + "\nActual DMG: " + state.heroDmg
+  ui.dmgUpgrade.disabled = state.currency < cost
+  ui.dmgUpgrade.textContent = "Bonus: " + config.baseDmgUpgrade + " Koszt: " + cost + " DMG: " + state.heroDmg;
 }
 
 function buyDmgUpgrade() {
