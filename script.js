@@ -10,12 +10,15 @@ const config = {
   enemyBaseDmg: 1,
   enemyGrowthDmg: 1.15,
   heroRespawnTime: 400,
-  enemyReward: 5,
+  enemyReward: 55,
   dmgBaseUpgradeCost: 10,
   costGrowth: 1.1,
   dmgUpgradeBonus: 10,
   hpBaseUpgradeCost: 10,
   hpUpgradeBonus: 10,
+  reductionStep: 1.5,
+  reductionCap: 30,
+  reductionBaseUpgradeCost: 10,
 };
 const state = {
   enemyNumber: 1,
@@ -29,9 +32,8 @@ const state = {
   isDefeated: false,
   dontShowAgain: false,
   currency: 0,
-  dmgLevel: 0,
-  hpLevel: 0,
   heroDmg: config.dmg,
+  levels: { dmg: 0, hp: 0, reduction: 0 },
 };
 const ui = {
   clickReceiver: document.querySelector(".arena"),
@@ -49,7 +51,30 @@ const ui = {
   currencyText: document.querySelector(".currency"),
   dmgUpgrade: document.querySelector(".dmg-upgrade"),
   hpUpgrade: document.querySelector(".hp-upgrade"),
+  reductionUpgrade: document.querySelector(".reduction-upgrade"),
 };
+const maxReductionLevel = config.reductionCap / config.reductionStep;
+const upgrades = {
+  dmg: {
+    baseCost: config.dmgBaseUpgradeCost,
+    maxLevel: Infinity,
+    apply() {
+      state.heroDmg = state.heroDmg + config.dmgUpgradeBonus;
+    },
+  },
+  hp: {
+    baseCost: config.hpBaseUpgradeCost,
+    maxLevel: Infinity,
+    apply() {
+      state.heroMaxHp = state.heroMaxHp + config.hpUpgradeBonus;
+    },
+  },
+  reduction: {
+    baseCost: config.reductionBaseUpgradeCost,
+    maxLevel: maxReductionLevel,
+    apply() {},
+  },
+}
 // Start Gry
 updateHpStatus();
 updateWaveNumber();
@@ -57,7 +82,8 @@ updateStage();
 updateHeroHp();
 updateCurrency();
 updateShop();
-setInterval(enemyAttack, config.enemyCooldownTime)
+updateReductionButton();
+setInterval(enemyAttack, config.enemyCooldownTime);
 
 ui.clickReceiver.addEventListener("click", () => {
   if (state.isCoolingDown || state.isDefeated) {
@@ -106,12 +132,13 @@ ui.hero.addEventListener("animationend", (event) => {
 
 ui.okButton.addEventListener("click", () => {
   state.dontShowAgain = ui.check.checked;
-  ui.komunikat.classList.add("komunikat-hidden")
+  ui.komunikat.classList.add("komunikat-hidden");
   respawnHero();
-})
+});
 
-ui.dmgUpgrade.addEventListener("click", buyDmgUpgrade);
-ui.hpUpgrade.addEventListener("click", buyHpUpgrade)
+ui.dmgUpgrade.addEventListener("click", () => buyUpgrade("dmg"));
+ui.hpUpgrade.addEventListener("click", () => buyUpgrade("hp"));
+ui.reductionUpgrade.addEventListener("click", () => buyUpgrade("reduction"));
 
 function updateHpStatus() {
   drawBar(ui.hpStatus, ui.hpNumber, state.enemyHp, state.enemyMaxHp);
@@ -154,7 +181,9 @@ function calcEnemyMaxHp(stage) {
 }
 
 function calcEnemyDmg(stage) {
-  return roundTo2(config.enemyBaseDmg * Math.pow(config.enemyGrowthDmg, stage - 1));
+  return roundTo2(
+    config.enemyBaseDmg * Math.pow(config.enemyGrowthDmg, stage - 1),
+  );
 }
 
 function showDmg(dmg) {
@@ -172,13 +201,16 @@ function showDmg(dmg) {
 }
 
 function enemyAttack() {
-  if (state.isCoolingDown || state.isDefeated) { return; }
-  state.heroHp = roundTo2(state.heroHp - state.enemyDmg);
+  if (state.isCoolingDown || state.isDefeated) {
+    return;
+  }
+  const damageTaken = roundTo2(state.enemyDmg * (1 - getReduction() / 100));
+  state.heroHp = roundTo2(state.heroHp - damageTaken);
   state.heroHp = Math.max(0, state.heroHp);
   updateHeroHp();
   if (state.heroHp <= 0) {
-  heroDefeated();
-}
+    heroDefeated();
+  }
 }
 
 function drawBar(fillEl, textEl, current, max) {
@@ -188,12 +220,12 @@ function drawBar(fillEl, textEl, current, max) {
 }
 
 function roundTo2(value) {
-  return Math.round(value*100) / 100;
+  return Math.round(value * 100) / 100;
 }
 
-function resetStage(){
+function resetStage() {
   state.enemyNumber = 1;
-  state.enemyMaxHp = calcEnemyMaxHp(state.stage)
+  state.enemyMaxHp = calcEnemyMaxHp(state.stage);
   state.enemyHp = state.enemyMaxHp;
   state.heroHp = state.heroMaxHp;
   ui.enemy.classList.remove("enemy-hit");
@@ -216,43 +248,75 @@ function respawnHero() {
 }
 
 function updateCurrency() {
-  ui.currencyText.textContent = "Geo-Points: " + state.currency
+  ui.currencyText.textContent = "Geo-Points: " + state.currency;
 }
 
 function calcUpgradeCost(baseCost, level) {
-  return Math.floor(baseCost * Math.pow(config.costGrowth, level))
+  return Math.floor(baseCost * Math.pow(config.costGrowth, level));
 }
 
 function updateShop() {
-  const dmgCost = calcUpgradeCost(config.dmgBaseUpgradeCost, state.dmgLevel);
-  const hpCost = calcUpgradeCost(config.hpBaseUpgradeCost, state.hpLevel)
+  const dmgCost = calcUpgradeCost(config.dmgBaseUpgradeCost, state.levels.dmg);
+  const hpCost = calcUpgradeCost(config.hpBaseUpgradeCost, state.levels.hp);
   ui.dmgUpgrade.disabled = state.currency < dmgCost;
-  ui.dmgUpgrade.textContent = "Bonus: " + config.dmgUpgradeBonus + " Koszt: " + dmgCost + " DMG: " + state.heroDmg;
+  ui.dmgUpgrade.textContent =
+    "Bonus: " +
+    config.dmgUpgradeBonus +
+    " Koszt: " +
+    dmgCost +
+    " DMG: " +
+    state.heroDmg;
   ui.hpUpgrade.disabled = state.currency < hpCost;
-  ui.hpUpgrade.textContent = "Bonus: " + config.hpUpgradeBonus + " Koszt: " + hpCost + " MaxHP: " + state.heroMaxHp;
-  
+  ui.hpUpgrade.textContent =
+    "Bonus: " +
+    config.hpUpgradeBonus +
+    " Koszt: " +
+    hpCost +
+    " MaxHP: " +
+    state.heroMaxHp;
+  updateReductionButton();
 }
 
-function buyDmgUpgrade() {
-  const dmgCost = calcUpgradeCost(config.dmgBaseUpgradeCost, state.dmgLevel);
-  if(state.currency < dmgCost) {
-    return;
-  }
-  state.currency = state.currency - dmgCost;
-  state.dmgLevel = state.dmgLevel + 1;
-  state.heroDmg = state.heroDmg + config.dmgUpgradeBonus;
-  updateCurrency();
-  updateShop();
+function getReduction() {
+  return Math.min(
+    state.levels.reduction * config.reductionStep,
+    config.reductionCap,
+  );
 }
 
-function buyHpUpgrade() {
-  const hpCost = calcUpgradeCost(config.hpBaseUpgradeCost, state.hpLevel);
-  if(state.currency < hpCost) {
+function updateReductionButton() {
+  const reductionCost = calcUpgradeCost(
+    config.reductionBaseUpgradeCost,
+    state.levels.reduction,
+  );
+  if (state.levels.reduction >= maxReductionLevel) {
+    ui.reductionUpgrade.disabled = true;
+    ui.reductionUpgrade.textContent = "Redukcja DMG: MAX";
     return;
   }
-  state.currency = state.currency - hpCost;
-  state.hpLevel = state.hpLevel + 1;
-  state.heroMaxHp = state.heroMaxHp + config.hpUpgradeBonus;
+  ui.reductionUpgrade.disabled = state.currency < reductionCost;
+  ui.reductionUpgrade.textContent =
+    "Redukcja DMG: " + getReduction() + "% Koszt: " + reductionCost;
+}
+
+function buyUpgrade(name) {
+  const upgrade = upgrades[name];
+  const level = state.levels[name];
+
+  if (level >= upgrade.maxLevel) {
+    return;
+  }
+
+  const cost = calcUpgradeCost(upgrade.baseCost, level);
+
+  if (cost > state.currency) {
+    return;
+  }
+
+  state.currency = state.currency - cost;
+  state.levels[name] = level + 1;
+  upgrade.apply();
+
   updateCurrency();
   updateShop();
   updateHeroHp();
