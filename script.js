@@ -83,6 +83,11 @@ const upgrades = {
     apply() {},
   },
 }
+const bossLooks = {
+  colors: ["boss-color-1","boss-color-2","boss-color-3"],
+  shapes: ["boss-shape-square","boss-shape-circle","boss-shape-triangle"],
+  scales: ["boss-scale-1","boss-scale-2","boss-scale-3"]
+}
 // Start Gry
 setupEnemy();
 updateHpStatus();
@@ -90,9 +95,7 @@ updateWaveNumber();
 updateStage();
 updateHeroHp();
 updateCurrency();
-updateShop();
-updateReductionButton();
-setInterval(enemyAttack, config.enemyCooldownTime);
+updateShop(); 
 
 ui.clickReceiver.addEventListener("click", () => {
   if (state.isCoolingDown || state.isDefeated) {
@@ -108,7 +111,7 @@ ui.clickReceiver.addEventListener("click", () => {
   if (state.enemyHp <= 0) {
     ui.enemy.classList.add("enemy-defeated");
     state.isCoolingDown = true;
-    state.currency = state.currency + config.enemyReward;
+    state.currency = state.currency + calcReward(isBoss(state.enemyNumber));
     updateCurrency();
     updateShop();
 
@@ -184,7 +187,7 @@ function randomBetween(min, max) {
 }
 
 function isBoss(enemyNumber) {
-    return enemyNumber == config.maxEnemyWave
+    return enemyNumber === config.maxEnemyWave
 }
 
 function calcEnemyMaxHp(stage, boss) {
@@ -198,7 +201,7 @@ function calcEnemyMaxHp(stage, boss) {
 function calcEnemyDmg(stage, boss) {
   const base = roundTo2(config.enemyBaseDmg * Math.pow(config.enemyGrowthDmg, stage - 1),);
   if (boss) {
-    return base * config.bossDmgMultiplier;
+    return roundTo2(base * config.bossDmgMultiplier);
   }
   return base;
 }
@@ -220,9 +223,17 @@ function calcAttackInterval(stage, boss) {
 
 function setupEnemy() {
   const boss = isBoss(state.enemyNumber)
+  applyEnemyLook(boss)
   state.enemyMaxHp = calcEnemyMaxHp(state.stage, boss)
   state.enemyHp = state.enemyMaxHp
   state.enemyDmg = calcEnemyDmg(state.stage, boss)
+  state.attackInterval = calcAttackInterval(state.stage, boss);
+  restartEnemyAttack();
+}
+
+function restartEnemyAttack() {
+  clearInterval(state.attackTimer);
+  state.attackTimer = setInterval(enemyAttack, state.attackInterval);
 }
 
 function showDmg(dmg) {
@@ -358,4 +369,17 @@ function buyUpgrade(name) {
   updateCurrency();
   updateShop();
   updateHeroHp();
+}
+
+function pickRandom(list) {
+  return list[Math.floor(randomBetween(0, list.length))];
+}
+
+function applyEnemyLook(boss) {
+  ui.enemy.className = "enemy";
+  if(boss) {
+    ui.enemy.classList.add(pickRandom(bossLooks.colors));
+    ui.enemy.classList.add(pickRandom(bossLooks.shapes));
+    ui.enemy.classList.add(pickRandom(bossLooks.scales))
+  }
 }

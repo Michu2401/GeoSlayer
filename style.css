@@ -78,6 +78,18 @@ body {
   transition: opacity 0.2s;
 }
 
+.boss-color-1 { background-color: #07d12c; }
+.boss-color-2 { background-color: #eef607; }
+.boss-color-3 { background-color: #f90505;}
+
+.boss-shape-square { border-radius: 0;}
+.boss-shape-circle { border-radius: 50%;}
+.boss-shape-triangle { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+
+.boss-scale-1 { transform: scale(1.2);}
+.boss-scale-2 { transform: scale(1.4);}
+.boss-scale-3 { transform: scale(1.6);}
+
 .enemy-hit {
   animation: enemy-hit 0.2s ease-out;
 }
@@ -98,10 +110,10 @@ body {
 
 @keyframes enemy-hit {
   from {
-    background-color:red;
+    filter: brightness(1);
   }
   to {
-    background-color: rgb(99, 0, 0);
+    filter: brightness(0.4);
   }
 }
 
@@ -109,6 +121,7 @@ body {
   color: white;
   font-weight: 600;
   text-transform: uppercase;
+  margin-bottom: 30px;
 }
 
 .hp-bar {
