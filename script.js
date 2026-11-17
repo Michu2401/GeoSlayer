@@ -19,6 +19,12 @@ const config = {
   reductionStep: 1.5,
   reductionCap: 30,
   reductionBaseUpgradeCost: 10,
+  bossHpMultiplier: 3,
+  bossDmgMultiplier: 2,
+  bossRewardMultiplier: 5,
+  bossAttackFactor: 0.7,
+  attackSpeedGrowth: 0.95,
+  minAttackInterval: 300
 };
 const state = {
   enemyNumber: 1,
@@ -34,6 +40,8 @@ const state = {
   currency: 0,
   heroDmg: config.dmg,
   levels: { dmg: 0, hp: 0, reduction: 0 },
+  attackInterval: config.enemyCooldownTime,
+  attackTimer: null,
 };
 const ui = {
   clickReceiver: document.querySelector(".arena"),
@@ -76,6 +84,7 @@ const upgrades = {
   },
 }
 // Start Gry
+setupEnemy();
 updateHpStatus();
 updateWaveNumber();
 updateStage();
@@ -149,16 +158,14 @@ function updateHeroHp() {
 function nextEnemy() {
   ui.enemy.classList.remove("enemy-defeated");
   state.enemyNumber = state.enemyNumber + 1;
-  state.enemyHp = state.enemyMaxHp;
+  
   if (state.enemyNumber > config.maxEnemyWave) {
     state.enemyNumber = 1;
     state.stage++;
-    state.enemyMaxHp = calcEnemyMaxHp(state.stage);
-    state.enemyHp = state.enemyMaxHp;
-    state.enemyDmg = roundTo2(calcEnemyDmg(state.stage));
     state.heroHp = state.heroMaxHp;
     updateHeroHp();
   }
+  setupEnemy();
 
   updateHpStatus();
   updateWaveNumber();
@@ -176,14 +183,46 @@ function randomBetween(min, max) {
   return min + Math.random() * (max - min);
 }
 
-function calcEnemyMaxHp(stage) {
-  return Math.floor(config.baseHP * Math.pow(config.hpGrowth, stage - 1));
+function isBoss(enemyNumber) {
+    return enemyNumber == config.maxEnemyWave
 }
 
-function calcEnemyDmg(stage) {
-  return roundTo2(
-    config.enemyBaseDmg * Math.pow(config.enemyGrowthDmg, stage - 1),
-  );
+function calcEnemyMaxHp(stage, boss) {
+  const base =  Math.floor(config.baseHP * Math.pow(config.hpGrowth, stage - 1));
+  if (boss) {
+    return Math.floor(base * config.bossHpMultiplier);
+  }
+  return Math.floor(base);
+}
+
+function calcEnemyDmg(stage, boss) {
+  const base = roundTo2(config.enemyBaseDmg * Math.pow(config.enemyGrowthDmg, stage - 1),);
+  if (boss) {
+    return base * config.bossDmgMultiplier;
+  }
+  return base;
+}
+
+function calcReward(boss) {
+  if (boss) {
+    return config.enemyReward * config.bossRewardMultiplier;
+  }
+  return config.enemyReward;
+}
+
+function calcAttackInterval(stage, boss) {
+  if (boss) {
+    const delay = config.enemyCooldownTime * config.bossAttackFactor * Math.pow(config.attackSpeedGrowth, stage - 1)
+    return Math.round(Math.max(config.minAttackInterval, delay));
+  }
+  return config.enemyCooldownTime
+}
+
+function setupEnemy() {
+  const boss = isBoss(state.enemyNumber)
+  state.enemyMaxHp = calcEnemyMaxHp(state.stage, boss)
+  state.enemyHp = state.enemyMaxHp
+  state.enemyDmg = calcEnemyDmg(state.stage, boss)
 }
 
 function showDmg(dmg) {
@@ -225,8 +264,7 @@ function roundTo2(value) {
 
 function resetStage() {
   state.enemyNumber = 1;
-  state.enemyMaxHp = calcEnemyMaxHp(state.stage);
-  state.enemyHp = state.enemyMaxHp;
+  setupEnemy();
   state.heroHp = state.heroMaxHp;
   ui.enemy.classList.remove("enemy-hit");
   ui.enemy.classList.remove("enemy-defeated");
